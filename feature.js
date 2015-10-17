@@ -26,6 +26,7 @@
 
     function Tile(x, y) {
         this.init(x, y);
+        SimpleEmitter.invoke(this);
     }
 
     Tile.addRules = [];
@@ -59,14 +60,37 @@
             return false;
         }
 
+        if (!this.emit('beforeAddFeature', {
+            feature: newFeature
+        })) {
+            return false;
+        }
+
         newFeature.tile = this;
-        return this.features.push(newFeature);
+        this.features.push(newFeature);
+
+        this.emit('addedFeature', {
+            feature: newFeature
+        });
+
+        return true;
     };
 
     Tile.prototype.remove = function (feature) {
         if (contain(this.features, feature)) {
+
+            if (!this.emit('beforeRemoveFeature', {
+                    feature: feature
+                })) {
+                return;
+            }
+
             delete feature.tile;
-            return remove(this.features, feature);
+            remove(this.features, feature);
+
+            this.emit('removedFeature', {
+                feature: feature
+            });
         }
     };
 
@@ -86,6 +110,7 @@
 
     function Feature(type) {
         this.init(type);
+        SimpleEmitter.invoke(this);
     }
 
     Feature.CHARACTOR_TYPE = 0;
@@ -145,6 +170,18 @@
         return;
     };
 
+    Fields.prototype.filter = function (iterator) {
+        var filtered = [];
+
+        this.iterate(function (tile, i, j, map) {
+            if (iterator(tile, i, j, map)) {
+                filtered.push(tile);
+            }
+        });
+
+        return filtered;
+    };
+
     Fields.prototype.iterate = function (iterator) {
         var i, j, line, results = [];
 
@@ -171,6 +208,14 @@
         }
 
         return this.map[x][y].features;
+    };
+
+    Fields.prototype.findFeatures = function (type) {
+        return this.filter(function (tile) {
+            return tile.features.some(function (feature) {
+                return feature.type == type
+            });
+        });
     };
 
 

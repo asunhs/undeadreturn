@@ -1,9 +1,19 @@
 var fields = new Fields(9, 9),
     hero = new Feature(Feature.CHARACTOR_TYPE),
+    hero2 = new Feature(Feature.CHARACTOR_TYPE),
     mob = new Feature(Feature.MONSTER_TYPE);
 
 hero.physical = true;
+hero2.physical = true;
 mob.physical = true;
+
+fields.iterate(function (tile) {
+    tile.on('addedFeature', function (eventName, data) {
+        if (data.feature.type !== Feature.OBJECT_TYPE) {
+            console.log(data);
+        }
+    });
+});
 
 function setObjects(arr) {
     arr.forEach(function (pos) {
@@ -18,6 +28,9 @@ setObjects([[4,2],[4,3],[4,4],[5,4],[6,4]]);
 setObjects([[0,6],[1,6],[2,6],[3,6],[4,6],[4,7]]);
 
 fields.setFeature(hero, 5, 7);
+fields.setFeature(hero2, 6, 8);
 fields.setFeature(mob, 4, 1);
 
-var dm = new DistanceMap(fields, 5, 7);
+
+
+var dm = new DistanceMap(fields, [[5, 7], [6, 8]]);
