@@ -4,21 +4,25 @@ var fields = new Fields(9, 9),
     mob = new Feature(Feature.MONSTER_TYPE);
 
 hero.physical = true;
+hero.name = 'hero';
 hero2.physical = true;
+hero2.name = 'hero';
 mob.physical = true;
+mob.name = 'mob';
 
-fields.iterate(function (tile) {
+/*fields.iterate(function (tile) {
     tile.on('addedFeature', function (eventName, data) {
         if (data.feature.type !== Feature.OBJECT_TYPE) {
             console.log(data);
         }
     });
-});
+});*/
 
 function setObjects(arr) {
     arr.forEach(function (pos) {
         var object = new Feature(Feature.OBJECT_TYPE);
         object.physical = true;
+        object.name = 'wall';
         fields.setFeature(object, pos[0], pos[1]);
     });
 }
@@ -33,4 +37,6 @@ fields.setFeature(mob, 4, 1);
 
 
 
-var dm = new DistanceMap(fields, [[5, 7], [6, 8]]);
+//var dm = new DistanceMap(fields, [[5, 7], [6, 8]]);
+
+new UndeadReturnRenderer(fields);
