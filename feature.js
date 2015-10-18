@@ -239,7 +239,7 @@
             });
         }
 
-        function move(dx, dy) {
+        return function move(dx, dy) {
             var tile = feature.tile;
 
             if (!valid()) {
@@ -247,21 +247,6 @@
             }
 
             return tile.move(feature, fields.map[tile.x + dx][tile.y + dy]);
-        }
-
-        return {
-            up: function () {
-                return move(0, -1);
-            },
-            down: function () {
-                return move(0, 1);
-            },
-            left: function () {
-                return move(-1, 0);
-            },
-            right: function () {
-                return move(1, 0);
-            }
         };
     };
 
