@@ -85,7 +85,10 @@
                 return;
             }
 
-            delete feature.tile;
+            if (feature.tile === this) {
+                delete feature.tile;
+            }
+
             remove(this.features, feature);
 
             this.emit('removedFeature', {
@@ -96,9 +99,12 @@
 
     Tile.prototype.move = function (feature, tile) {
         if (contain(this.features, feature)) {
-            this.remove(feature);
-            tile.add(feature);
+            if (tile.add(feature)) {
+                this.remove(feature);
+                return true;
+            }
         }
+        return false;
     };
 
 
@@ -199,7 +205,12 @@
             return false;
         }
 
-        return this.map[x][y].add(feature);
+        if (this.map[x][y].add(feature)) {
+            feature.moveHandler = this.createMoveHandler(feature);
+            return true;
+        }
+
+        return false;
     };
 
     Fields.prototype.getFeatures = function (x, y) {
@@ -216,6 +227,42 @@
                 return feature.type == type
             });
         });
+    };
+
+    Fields.prototype.createMoveHandler = function (feature) {
+
+        var fields = this;
+
+        function valid() {
+            return fields.find(function (tile) {
+                return tile === feature.tile;
+            });
+        }
+
+        function move(dx, dy) {
+            var tile = feature.tile;
+
+            if (!valid()) {
+                return false;
+            }
+
+            return tile.move(feature, fields.map[tile.x + dx][tile.y + dy]);
+        }
+
+        return {
+            up: function () {
+                return move(0, -1);
+            },
+            down: function () {
+                return move(0, 1);
+            },
+            left: function () {
+                return move(-1, 0);
+            },
+            right: function () {
+                return move(1, 0);
+            }
+        };
     };
 
 
