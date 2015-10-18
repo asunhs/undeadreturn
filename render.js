@@ -53,7 +53,13 @@
 
 
     function Renderer(fields) {
-        this.init(fields);
+        //this.init(fields);
+        var renderer = this;
+
+        fields.on('render', function () {
+            renderer.init(fields);
+        });
+        fields.emit('render');
     }
 
     Renderer.prototype.init = function (fields) {
@@ -64,6 +70,14 @@
         this.tiles = fields.iterate(function (tile) {
             var tileDiv = createTile(tile);
             wrap.appendChild(tileDiv);
+
+            function tap() {
+                tile.emit('tap');
+            }
+
+            tileDiv.addEventListener('click', tap);
+            tileDiv.addEventListener('touchend', tap);
+
             return tileDiv;
         });
     };

@@ -142,6 +142,7 @@
 
     function Fields(width, height) {
         this.init(width, height);
+        SimpleEmitter.invoke(this);
     }
 
     Fields.prototype.init = function (width, height) {
@@ -222,11 +223,17 @@
     };
 
     Fields.prototype.findFeatures = function (type) {
-        return this.filter(function (tile) {
-            return tile.features.some(function (feature) {
-                return feature.type == type
+        var features = [];
+
+        this.iterate(function (tile) {
+            tile.features.filter(function (feature) {
+                return feature.type == type;
+            }).forEach(function (feature) {
+                features.push(feature)
             });
         });
+
+        return features;
     };
 
     Fields.prototype.createMoveHandler = function (feature) {
