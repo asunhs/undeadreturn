@@ -15,6 +15,10 @@
             }));
 
             monsters.forEach(function (monster) {
+                if (monster.dead) {
+                    return;
+                }
+
                 var next = dm.step(monster.tile.x, monster.tile.y);
                 monster.tile.move(monster, fields.map[next[0]][next[1]]);
             });
@@ -24,30 +28,29 @@
 
 
         function findMovingTarget(tile) {
-
-            var target = heroes.find(function (hero) {
+            return heroes.find(function (hero) {
                 var dx = hero.tile.x - tile.x,
                     dy = hero.tile.y - tile.y;
 
                 return (dx == 0 && (dy == -1 || dy == 1)) || (dy == 0 && (dx == -1 || dx == 1));
             });
-
-            if (!target) {
-                return;
-            }
-
-            if (!target.physical) {
-                return target;
-            }
-
-            if (tile.features.some(function (feature) {
-                return feature.physical;
-            })) {
-                return;
-            }
-
-            return target;
         }
+
+        function getNonMonster(tile) {
+            tile.features.filter(function (feature) {
+                return feature.type != Feature.MONSTER_TYPE;
+            });
+        }
+
+        function killingMonster(tile) {
+            tile.features.filter(function (feature) {
+                return feature.type == Feature.MONSTER_TYPE;
+            }).forEach(function (monster) {
+                monster.dead = true;
+            });
+        }
+
+
 
         fields.iterate(function (tile) {
             tile.on('tap', function (eventName, data) {
@@ -58,7 +61,15 @@
                     return;
                 }
 
-                target.tile.move(target, tile);
+                // action 분기
+                if (tile.canMoveIn()) {
+                    target.tile.move(target, tile);
+                } else if (!getNonMonster(tile)) {
+                    killingMonster(tile);
+                } else {
+                    return;
+                }
+
                 moveMonster(fields.findFeatures(Feature.MONSTER_TYPE));
                 fields.emit('render');
             });

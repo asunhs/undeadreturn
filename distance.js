@@ -103,18 +103,22 @@
     };
 
     DistanceMap.prototype.step = function (x, y) {
-        return [[x-1,y],[x+1,y],[x,y-1],[x,y+1]].map(function (around) {
-            around.push(this.getDistance(around[0], around[1]));
-            return around;
-        }, this).filter(function (around) {
-            return around[2] > 0;
-        }).reduce(function (choose, around) {
-            if (choose[2] > around[2]) {
+        try {
+            return [[x-1,y],[x+1,y],[x,y-1],[x,y+1]].map(function (around) {
+                around.push(this.getDistance(around[0], around[1]));
                 return around;
-            } else {
-                return choose;
-            }
-        });
+            }, this).filter(function (around) {
+                return around[2] > 0;
+            }).reduce(function (choose, around) {
+                if (choose[2] > around[2]) {
+                    return around;
+                } else {
+                    return choose;
+                }
+            });
+        } catch (e) {
+            return [x, y];
+        }
     };
 
 

@@ -97,6 +97,12 @@
         }
     };
 
+    Tile.prototype.canMoveIn = function () {
+        return !this.features.some(function (feature) {
+            return feature.physical;
+        });
+    };
+
     Tile.prototype.move = function (feature, tile) {
         if (contain(this.features, feature)) {
             if (tile.add(feature)) {

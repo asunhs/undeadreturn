@@ -39,6 +39,11 @@
         if (feature.name) {
             featureDiv.classList.add(feature.name);
         }
+
+        if (feature.dead) {
+            featureDiv.classList.add('dead');
+        }
+
         return featureDiv;
     }
 
